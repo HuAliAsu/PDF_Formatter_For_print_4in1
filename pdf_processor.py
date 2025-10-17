@@ -18,63 +18,25 @@ A4_WIDTH = mm_to_points(A4_WIDTH_MM)
 A4_HEIGHT = mm_to_points(A4_HEIGHT_MM)
 
 
-def get_user_input():
-    """Get all user inputs for processing options."""
-    while True:
-        pdf_path = input("Enter full PDF path: ").strip().strip('"\'')
-        if os.path.exists(pdf_path) and pdf_path.lower().endswith('.pdf'):
-            break
-        print("Error: File not found or is not a PDF.")
-
-    while True:
-        page_choice = input("Select pages (1=Odd, 2=Even): ").strip()
-        if page_choice in ["1", "2"]:
-            page_type = "odd" if page_choice == "1" else "even"
-            break
-        print("Please enter 1 or 2.")
-
-    while True:
-        layout_choice = input(
-            "Choose layout (1 or 2):\n"
-            "Layout 1:\n  A-B\n  C-D\n\n"
-            "Layout 2:\n  B-A\n  D-C\n"
-            "Your choice: "
-        ).strip()
-        if layout_choice in ["1", "2"]:
-            break
-        print("Please enter 1 or 2.")
-
-    # Crop margins
-    crop_str = input("Crop margins (top right bottom left in mm, e.g. 5 5 5 5 or 0 0 0 0): ").strip()
-    try:
-        crop_values = [float(v) for v in crop_str.split()]
-        if len(crop_values) != 4:
-            raise ValueError
-    except ValueError:
-        crop_values = [0, 0, 0, 0]
-
-    # Binding gutter offset
-    while True:
-        gutter_side = input("Binding side (1=Right, 2=Left, 0=None): ").strip()
-        if gutter_side in ["0", "1", "2"]:
-            break
-        print("Please enter 0, 1 or 2.")
-
-    gutter_offset = 0
-    if gutter_side != "0":
-        try:
-            gutter_offset = float(input("Enter offset amount in mm: ").strip())
-        except ValueError:
-            gutter_offset = 0
-
-    # Rotate landscape
-    rotate_landscape = input("Rotate landscape pages automatically? (y/n): ").strip().lower() == "y"
-
-    return pdf_path, page_type, layout_choice, crop_values, gutter_side, gutter_offset, rotate_landscape
-
-
 def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_side, gutter_offset, rotate_landscape):
-    """Creates a new 4-in-1 PDF with cropping, gutter, and rotation."""
+    """
+    Creates a new 4-in-1 PDF with specified options.
+
+    Args:
+        pdf_path (str): The full path to the source PDF.
+        page_type (str): 'odd' or 'even'.
+        layout_choice (str): '1' or '2'.
+        crop_values (list[float]): A list of 4 floats for crop margins [top, right, bottom, left] in mm.
+        gutter_side (str): '1' for right, '2' for left, '0' for none.
+        gutter_offset (float): The gutter offset in mm.
+        rotate_landscape (bool): Whether to rotate landscape pages.
+
+    Returns:
+        str: The path to the newly created PDF file.
+
+    Raises:
+        Exception: If any error occurs during PDF processing.
+    """
     try:
         reader = PdfReader(pdf_path)
         writer = PdfWriter()
@@ -87,8 +49,7 @@ def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_si
             page_indices = [i for i in range(total_pages) if (i + 1) % 2 == 0]
 
         if not page_indices:
-            print(f"No '{page_type}' pages found.")
-            return
+            raise ValueError(f"No '{page_type}' pages found in the document.")
 
         page_chunks = [page_indices[i:i + 4] for i in range(0, len(page_indices), 4)]
 
@@ -96,7 +57,7 @@ def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_si
         crop_top, crop_right, crop_bottom, crop_left = [mm_to_points(v) for v in crop_values]
         gutter_shift = mm_to_points(gutter_offset)
 
-        for chunk_index, chunk in enumerate(page_chunks, start=1):
+        for chunk in page_chunks:
             a4_page = writer.add_blank_page(width=A4_WIDTH, height=A4_HEIGHT)
 
             positions = {
@@ -163,8 +124,6 @@ def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_si
                     src_page.add_transformation(transformation)
                     a4_page.merge_page(src_page, expand=False)
 
-            print(f"Processed group {chunk_index}/{len(page_chunks)}")
-
         # --- Save file ---
         base_name = os.path.basename(pdf_path)
         dir_name = os.path.dirname(pdf_path)
@@ -177,14 +136,7 @@ def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_si
         with open(output_filename, "wb") as f:
             writer.write(f)
 
-        print("\n✅ Success! File saved to:")
-        print(output_filename)
+        return output_filename
 
     except Exception as e:
-        print(f"\n❌ Error: {e}")
-        print("Please make sure the PDF is not encrypted or corrupted.")
-
-
-if __name__ == "__main__":
-    pdf_path, page_type, layout_choice, crop_values, gutter_side, gutter_offset, rotate_landscape = get_user_input()
-    create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_side, gutter_offset, rotate_landscape)
+        raise Exception(f"An error occurred during PDF processing: {e}")
