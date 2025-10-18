@@ -17,19 +17,38 @@ def mm_to_points(mm):
 A4_WIDTH = mm_to_points(A4_WIDTH_MM)
 A4_HEIGHT = mm_to_points(A4_HEIGHT_MM)
 
+def get_unique_filename(path):
+    """
+    Checks if a file exists and returns a unique filename by appending a version number.
+    e.g., 'file.pdf' -> 'file_v2.pdf'
+    """
+    if not os.path.exists(path):
+        return path
 
-def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_side, gutter_offset, rotate_landscape):
+    directory, filename = os.path.split(path)
+    name, ext = os.path.splitext(filename)
+
+    version = 2
+    while True:
+        new_name = f"{name}_v{version}{ext}"
+        new_path = os.path.join(directory, new_name)
+        if not os.path.exists(new_path):
+            return new_path
+        version += 1
+
+def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_side, gutter_offset, rotate_landscape, reverse_order):
     """
     Creates a new 4-in-1 PDF with specified options.
 
     Args:
         pdf_path (str): The full path to the source PDF.
-        page_type (str): 'odd' or 'even'.
+        page_type (str): 'odd', 'even', or 'all'.
         layout_choice (str): '1' or '2'.
         crop_values (list[float]): A list of 4 floats for crop margins [top, right, bottom, left] in mm.
         gutter_side (str): '1' for right, '2' for left, '0' for none.
         gutter_offset (float): The gutter offset in mm.
         rotate_landscape (bool): Whether to rotate landscape pages.
+        reverse_order (bool): Whether to reverse the order of the 4-page chunks.
 
     Returns:
         str: The path to the newly created PDF file.
@@ -42,16 +61,22 @@ def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_si
         writer = PdfWriter()
         total_pages = len(reader.pages)
 
-        # Select odd/even pages
+        # Select pages based on user choice
         if page_type == "odd":
             page_indices = [i for i in range(total_pages) if (i + 1) % 2 != 0]
-        else:
+        elif page_type == "even":
             page_indices = [i for i in range(total_pages) if (i + 1) % 2 == 0]
+        else: # "all"
+            page_indices = list(range(total_pages))
 
         if not page_indices:
             raise ValueError(f"No '{page_type}' pages found in the document.")
 
         page_chunks = [page_indices[i:i + 4] for i in range(0, len(page_indices), 4)]
+
+        # Reverse the order of chunks if requested
+        if reverse_order:
+            page_chunks.reverse()
 
         # Convert offsets to points
         crop_top, crop_right, crop_bottom, crop_left = [mm_to_points(v) for v in crop_values]
@@ -128,10 +153,13 @@ def create_4_in_1_pdf(pdf_path, page_type, layout_choice, crop_values, gutter_si
         base_name = os.path.basename(pdf_path)
         dir_name = os.path.dirname(pdf_path)
         file_name, _ = os.path.splitext(base_name)
-        output_filename = os.path.join(
+
+        output_filename_template = os.path.join(
             dir_name,
             f"{file_name}_4in1_{page_type}_layout{layout_choice}.pdf"
         )
+
+        output_filename = get_unique_filename(output_filename_template)
 
         with open(output_filename, "wb") as f:
             writer.write(f)
