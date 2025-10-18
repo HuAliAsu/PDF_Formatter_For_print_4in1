@@ -1,119 +1,76 @@
+# 🧩 PDF Formatter for Pocket Book Printing (4-in-1)
 
-# 🧩 PDF_Formatter_For_print_4in1
+This application provides a user-friendly graphical interface to rearrange pages from any PDF file into a **4-in-1 layout** on A4 paper. It is designed to help with printing pocket-sized books (A6) on a standard A4 printer.
 
-**T_PDF_in_4_Pages_Pro** is a Python script that rearranges pages from any PDF file into a **4-in-1 layout** on A4 paper.
-It includes advanced options such as cropping margins, gutter binding offsets, and automatic rotation for landscape pages.
+The tool includes advanced options such as individual margin cropping, gutter binding offsets, automatic rotation for landscape pages, and special features for home printing.
+
+![App Screenshot](https://i.imgur.com/your-screenshot.png) <!-- Placeholder for a future screenshot -->
 
 ---
 
 ## 🚀 Features
 
-| Feature                        | Description                                                        |
-| ------------------------------ | ------------------------------------------------------------------ |
-| 📄 **4-in-1 Page Layout**      | Combine four PDF pages into one A4 page                            |
-| 🔢 **Odd / Even Selection**    | Choose whether to include only odd or even pages                   |
-| 📐 **Automatic Scaling**       | Pages are automatically scaled to fit each quadrant                |
-| ✂️ **Margin Cropping**         | Trim margins before merging (top/right/bottom/left in millimeters) |
-| 🔁 **Automatic Rotation**      | Rotate landscape-oriented pages automatically                      |
-| 📏 **Gutter (Binding Offset)** | Shift all pages left or right to leave space for book binding      |
-| 🧩 **Two Layout Styles**       | Choose between Layout 1 (A-B / C-D) or Layout 2 (B-A / D-C)        |
-| ⚙️ **PyPDF Compatibility**     | Works with both `pypdf` and `PyPDF2` libraries                     |
+| Feature                          | Description                                                              |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| 🖥️ **Graphical User Interface**  | Easy-to-use interface built with CustomTkinter.                          |
+| 📄 **4-in-1 Page Layout**        | Combine four PDF pages into one A4 page.                                 |
+| 📚 **Page Selection**            | Process all, odd, or even pages.                                         |
+| 📐 **Automatic Scaling**         | Pages are automatically scaled to fit each quadrant.                     |
+| ✂️ **Individual Margin Cropping**| Trim each margin (top, right, bottom, left) independently in millimeters.|
+| 🔁 **Automatic Rotation**         | Rotate landscape-oriented pages automatically.                           |
+| 📏 **Binding Gutter**            | Add extra space to the inner margin for bookbinding.                     |
+| 🔄 **Reverse Order Printing**   | Reverse the order of page chunks for specific printer models.            |
+| 📂 **File Versioning**           | Avoids overwriting files by creating new versions (e.g., `file_v2.pdf`).   |
 
 ---
 
 ## 📦 Requirements
 
-* Python **3.9+**
-* One of the following libraries:
+*   Python **3.9+**
+*   Dependencies listed in `requirements.txt`.
 
-  * [`pypdf`](https://pypi.org/project/pypdf/)
-  * or [`PyPDF2`](https://pypi.org/project/PyPDF2/)
-
-Install with:
+To install the dependencies, run:
 
 ```bash
-pip install pypdf
-# or
-pip install PyPDF2
+pip install -r requirements.txt
 ```
 
 ---
 
 ## 💻 Usage
 
-Run the script in a terminal:
+To run the application, execute the `app_gui.py` script:
 
 ```bash
-python T_PDF_in_4_Pages_Pro.py
+python app_gui.py
 ```
 
-Then follow the prompts:
-
-```
-Enter full PDF path: "C:\Users\John\Desktop\MyFile.pdf"
-Select pages (1=Odd, 2=Even): 1
-Choose layout (1 or 2):
-Layout 1:
-  A-B
-  C-D
-
-Layout 2:
-  B-A
-  D-C
-Your choice: 1
-
-Crop margins (top right bottom left in mm, e.g. 5 5 5 5 or 0 0 0 0): 3 3 3 3
-Binding side (1=Right, 2=Left, 0=None): 2
-Enter offset amount in mm: 5
-Rotate landscape pages automatically? (y/n): y
-```
+This will open the graphical user interface where you can select your PDF file and configure the processing options.
 
 ---
 
-## 🧾 Output
+## 🛠️ How to Create an Executable (`.exe`)
 
-A new file will be saved in the same folder as the original PDF,
-with a name like:
+You can create a standalone executable file using `PyInstaller`. This allows you to run the application on Windows without needing a Python installation.
 
-```
-MyFile_4in1_odd_layout1.pdf
-```
+1.  **Install PyInstaller:**
+    ```bash
+    pip install pyinstaller
+    ```
 
-Each A4 page will contain up to four smaller PDF pages, arranged according to the selected layout.
+2.  **Build the Executable:**
+    Run the following command in your terminal from the project's root directory. The `--noconsole` flag prevents the command prompt from opening when you run the app, and `--onefile` bundles everything into a single `.exe` file.
 
----
+    ```bash
+    pyinstaller --name "PDF_Formatter" --onefile --noconsole app_gui.py
+    ```
 
-## 🧠 Notes
-
-* If your PDF is **encrypted**, please remove the password protection before running this script.
-* All page dimensions and offsets are converted automatically from **millimeters** to PDF **points (1 inch = 72 points)**.
-* The script detects whether you have `pypdf` or `PyPDF2` installed and works with either.
-
----
-
-## 🧰 Example Layouts
-
-**Layout 1:**
-
-```
-A-B
-C-D
-```
-
-**Layout 2:**
-
-```
-B-A
-D-C
-```
+3.  **Find the Executable:**
+    The final executable file, `PDF_Formatter.exe`, will be located in the `dist` folder that PyInstaller creates.
 
 ---
 
 ## 📜 License
 
 This project is released under the **MIT License**.
-You’re free to use, modify, and distribute it — just keep this notice.
-
----
-
-Would you like me to include **example images** of Layout 1 and Layout 2 (auto-generated diagrams) inside the README too?
+You’re free to use, modify, and distribute it.
