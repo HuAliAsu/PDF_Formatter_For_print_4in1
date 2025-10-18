@@ -12,7 +12,7 @@ class App(ctk.CTk):
         super().__init__()
 
         self.title("PDF 4-in-1 Tool for Pocket Books")
-        self.geometry("550x750")
+        self.geometry("550x780")
         ctk.set_appearance_mode("Dark")
         ctk.set_default_color_theme("blue")
 
@@ -21,7 +21,7 @@ class App(ctk.CTk):
         self.output_folder = "" # To store the last output folder
 
         # --- Help Button ---
-        self.help_button = ctk.CTkButton(self, text="?", width=30, command=self.show_help)
+        self.help_button = ctk.CTkButton(self, text="Help / راهنما", command=self.show_help)
         self.help_button.grid(row=0, column=2, padx=(0, 20), pady=(20, 5), sticky="e")
 
         # --- File Selection ---
@@ -62,17 +62,29 @@ class App(ctk.CTk):
         self.crop_frame = ctk.CTkFrame(self)
         self.crop_frame.grid(row=5, column=0, columnspan=3, padx=20, pady=10, sticky="ew")
         self.crop_frame.grid_columnconfigure((0, 1, 2, 3), weight=1)
+
         self.crop_label = ctk.CTkLabel(self.crop_frame, text="Crop Margins (mm):")
         self.crop_label.grid(row=0, column=0, columnspan=4, padx=15, pady=(10, 0), sticky="w")
 
+        # Labels for crop entries
+        self.crop_top_label = ctk.CTkLabel(self.crop_frame, text="Top")
+        self.crop_top_label.grid(row=1, column=0, padx=5, pady=(5,0), sticky="s")
+        self.crop_right_label = ctk.CTkLabel(self.crop_frame, text="Right")
+        self.crop_right_label.grid(row=1, column=1, padx=5, pady=(5,0), sticky="s")
+        self.crop_bottom_label = ctk.CTkLabel(self.crop_frame, text="Bottom")
+        self.crop_bottom_label.grid(row=1, column=2, padx=5, pady=(5,0), sticky="s")
+        self.crop_left_label = ctk.CTkLabel(self.crop_frame, text="Left")
+        self.crop_left_label.grid(row=1, column=3, padx=5, pady=(5,0), sticky="s")
+
+        # Crop entries
         self.crop_top_entry = ctk.CTkEntry(self.crop_frame, placeholder_text="Top")
-        self.crop_top_entry.grid(row=1, column=0, padx=5, pady=10, sticky="ew")
+        self.crop_top_entry.grid(row=2, column=0, padx=5, pady=(0,10), sticky="ew")
         self.crop_right_entry = ctk.CTkEntry(self.crop_frame, placeholder_text="Right")
-        self.crop_right_entry.grid(row=1, column=1, padx=5, pady=10, sticky="ew")
+        self.crop_right_entry.grid(row=2, column=1, padx=5, pady=(0,10), sticky="ew")
         self.crop_bottom_entry = ctk.CTkEntry(self.crop_frame, placeholder_text="Bottom")
-        self.crop_bottom_entry.grid(row=1, column=2, padx=5, pady=10, sticky="ew")
+        self.crop_bottom_entry.grid(row=2, column=2, padx=5, pady=(0,10), sticky="ew")
         self.crop_left_entry = ctk.CTkEntry(self.crop_frame, placeholder_text="Left")
-        self.crop_left_entry.grid(row=1, column=3, padx=5, pady=10, sticky="ew")
+        self.crop_left_entry.grid(row=2, column=3, padx=5, pady=(0,10), sticky="ew")
 
         for entry in [self.crop_top_entry, self.crop_right_entry, self.crop_bottom_entry, self.crop_left_entry]:
             entry.insert(0, "0")
@@ -88,10 +100,8 @@ class App(ctk.CTk):
         self.gutter_side_menu.grid(row=0, column=1, padx=15, pady=10, sticky="ew")
 
         self.gutter_offset_label = ctk.CTkLabel(self.gutter_frame, text="Gutter Offset (mm):")
-        self.gutter_offset_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
         self.gutter_offset_entry = ctk.CTkEntry(self.gutter_frame, placeholder_text="e.g., 10")
         self.gutter_offset_entry.insert(0, "0")
-        self.gutter_offset_entry.grid(row=1, column=1, padx=15, pady=10, sticky="ew")
         self.toggle_gutter_offset() # Set initial state
 
         # --- Action Buttons Frame ---
@@ -121,11 +131,11 @@ class App(ctk.CTk):
 
     def toggle_gutter_offset(self, choice=None):
         if self.gutter_side_menu.get() == "None":
-            self.gutter_offset_entry.configure(state="disabled")
-            self.gutter_offset_entry.delete(0, tkinter.END)
-            self.gutter_offset_entry.insert(0, "0")
+            self.gutter_offset_label.grid_remove()
+            self.gutter_offset_entry.grid_remove()
         else:
-            self.gutter_offset_entry.configure(state="normal")
+            self.gutter_offset_label.grid(row=1, column=0, padx=15, pady=10, sticky="w")
+            self.gutter_offset_entry.grid(row=1, column=1, padx=15, pady=10, sticky="ew")
 
     def show_help(self):
         help_text = (
@@ -185,7 +195,9 @@ class App(ctk.CTk):
             if gutter_side_str == "Right": gutter_side = "1"
             elif gutter_side_str == "Left": gutter_side = "2"
 
-            gutter_offset = float(self.gutter_offset_entry.get().strip() or "0")
+            gutter_offset = 0
+            if self.gutter_side_menu.get() != "None":
+                 gutter_offset = float(self.gutter_offset_entry.get().strip() or "0")
 
             output_path = create_4_in_1_pdf(
                 pdf_path, page_type, layout_choice, crop_values,
