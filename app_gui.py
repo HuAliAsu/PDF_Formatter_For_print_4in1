@@ -21,7 +21,7 @@ class App(ctk.CTk):
         self.output_folder = "" # To store the last output folder
 
         # --- Help Button ---
-        self.help_button = ctk.CTkButton(self, text="Help / راهنما", command=self.show_help)
+        self.help_button = ctk.CTkButton(self, text="  Help  ", command=self.show_help)
         self.help_button.grid(row=0, column=2, padx=(0, 20), pady=(20, 5), sticky="e")
 
         # --- File Selection ---
@@ -141,11 +141,11 @@ class App(ctk.CTk):
         help_text = (
             "This application helps you print pocket-sized books (A6) using a standard A4 printer.\n\n"
             "It arranges four original pages onto a single A4 sheet, which you can then print, cut, and fold.\n\n"
-            "Key Features:\n"
-            "- **Layouts:** Choose how pages are ordered on the sheet.\n"
-            "- **Page Selection:** Print all, odd, or even pages.\n"
-            "- **Crop:** Trim unwanted margins from the original pages.\n"
-            "- **Gutter:** Add extra space to the inner margin for binding.\n"
+            "Key Features:\n\n"
+            "- **Layouts:** Choose how pages are ordered on the sheet.\n\n"
+            "- **Page Selection:** Print all, odd, or even pages.\n\n"
+            "- **Crop:** Trim unwanted margins from the original pages.\n\n"
+            "- **Gutter:** Add extra space to the inner margin for binding.\n\n"
             "- **Reverse Order:** Flips the order of the output pages. Useful for printers that don't reverse the stack automatically when printing double-sided."
         )
         messagebox.showinfo("How to Use", help_text)

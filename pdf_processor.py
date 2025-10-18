@@ -1,10 +1,5 @@
 import os
-
-# --- Import PyPDF2 or pypdf safely ---
-try:
-    from pypdf import PdfReader, PdfWriter, Transformation
-except ImportError:
-    from PyPDF2 import PdfReader, PdfWriter, Transformation
+from pypdf import PdfReader, PdfWriter, Transformation
 
 # --- A4 size in millimeters ---
 A4_WIDTH_MM = 210
